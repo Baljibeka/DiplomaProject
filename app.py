@@ -3,6 +3,7 @@ import numpy as np
 import math
 import cmath
 import math
+from PIL import Image
 import pandas as pd
 import scipy.integrate as integrate
 from scipy.integrate import quad
@@ -18,31 +19,53 @@ def local_css(file_name):
 
 local_css("style/style.css")
 
-
 def page1():
-    st.subheader("Welcome to the Thermoelastic Half Plane BVP Calculator!")
-    st.title("This calculator is designed to solve the boundary value problem for a thermoelastic half plane subjected to both heat source and mass force")
-    st.write("Using this calculator is simple - just input the necessary parameters and let the calculator do the rest. You can input the material properties, the dimensions of the half plane, and the boundary conditions. The calculator will then solve the partial differential equations governing the behavior of the half plane and provide you with the resulting temperature and displacement fields.")
+    st.title("This is Earth-Deep Solver. Welcome!")
+    st.subheader("This solver is designed to solve the boundary value problems for a thermoelastic half plane subjected to both heat sources and mass forces")
+    st.write("Using this solver is simple - just input the necessary parameters and let the solver do the rest. You can input the material properties, the dimensions of the half plane, and the boundary conditions. The solver will then solve the partial differential equations governing the behavior of the half plane and provide you with the resulting temperature and displacement fields.")
 
     st.write("---")
     st.header("Get started!")
     st.write("##")
-    rockParameters = pd.DataFrame({
-        'granite': [2.61, 4.02, 0.26, 2.4, 946, 0.8, 5600, 2750, 1.974, 4.24, 13.3, 1.7, 9.27],
-        'sandstone': [2.69, 4.13, 0.09, 1.66, 972, 0.64, 3272, 1293, 0.45, 1.98, 2.5, 0.44, 9.86],
-        'silicified shale':[2.72, 5.2, 0.21, 2.4, 887, 0.53, 3243, 1808, 0.89, 1.08, 2.65, 0.32, 11.27],
-        'silistone':[2.69, 3.87, 0.29, 1.49, 880, 0.5, 2390, 1204, 0.39, 0.756, 1.5, 0.29, 10.28],
-        'shales':[2.77, 5.25, 0.15, 2.46, 866, 0.68, 4493, 2879, 2.296, 1, 5.2, 0.6, 9.46],
-          }, index=['Density', 'Youngs modulus', 'Poisson ratio', 'Thermal conductivity', 'Heat capacity', 'Thermal expansion', 'Velocity of p waves', 'Velosity of s waves', 'Shear modulus', 'Lame parameter', 'Thermoelastic parameter gamma', 'Thermal expansion eta', 'Thermal conductivity kappa'])
-    st.write("The rock parameters you can choose from")
-    st.dataframe(rockParameters)
-    BVP_input = st.number_input("Choose BVP: ")
-    rock_parameters = st.text_input("Choose your rock from the table")
-    omegaParameterFrom=st.number_input("Choose omega1 ")
-    omegaParameterTo = st.number_input("Choose omega2 ")
+    tableRocksImage = Image.open('Tablerocks.png')
+    st.subheader("The rock parameters you can choose from")
+    st.image(tableRocksImage, width=800, caption='Table of rocks')
+    BVP_input = st.selectbox('Choose BVP', ('1', '2', '3', '4'))
+    rock_parameters = st.selectbox("Choose the rock from the table or input your own parameters", ("granite", "sandstone", "silicified shale", "silistone", "shales", "other"))
+    if rock_parameters:
+        if rock_parameters == "granite" or rock_parameters == "sandstone" or rock_parameters == "silicified shale" or rock_parameters == "silistone" or rock_parameters == "shales":
+            st.session_state.rock_parameters = rock_parameters
+        else:
+            sigmaPar = st.number_input("σ * 10^-3 [kg/m3]")
+            youngsMod = st.number_input("E * 10^-10 [N/m2]")
+            nuPar = st.number_input("ν")
+            lambdaTPar = st.number_input("λ_t [Vt/m*K]")
+            CTPar = st.number_input("C_t [J/N*K]")
+            alphaTPar = st.number_input("α_t * 10^5 [I/K]")
+            velPPar = st.number_input("ϑ_p [m/sec]")
+            velSPar = st.number_input("ϑ_s [m/sec]")
+            muPar = st.number_input("μ * 10^-10 [kg/m*sec^2]")
+            lambdaPar = st.number_input("λ * 10^-10 [kg/m*sec^2]")
+            gammaPar = st.number_input("γ * 10^-5 [Pa/K]")
+            etaPar = st.number_input("η * 10^-8 [K*sec/m^2]")
+            kappaPar = st.number_input("κ * 10^7[m^2/sec]")
+            st.session_state.sigmaPar = sigmaPar
+            st.session_state.youngsMod= youngsMod
+            st.session_state.nuPar = nuPar
+            st.session_state.lambdaTPar=lambdaTPar
+            st.session_state.CTPar = CTPar
+            st.session_state.alphaTPar = alphaTPar
+            st.session_state.velPPar = velPPar
+            st.session_state.velSPar = velSPar
+            st.session_state.muPar = muPar
+            st.session_state.lambdaPar = lambdaPar
+            st.session_state.gammaPar = gammaPar
+            st.session_state.etaPar = etaPar
+            st.session_state.kappaPar = kappaPar
+    omegaParameterFrom=st.number_input("Choose frequency 1 ")
+    omegaParameterTo = st.number_input("Choose frequency 2 ")
     xiParInput = st.number_input("Choose constant xi")
     st.session_state.BVP_input = BVP_input
-    st.session_state.rock_parameters = rock_parameters
     st.session_state.omegaParameterFrom = omegaParameterFrom
     st.session_state.omegaParameterTo = omegaParameterTo
     st.session_state.xiParInput = xiParInput
@@ -53,21 +76,21 @@ def page2():
     # Retrieve the user input from session state
     BVP_input = st.session_state.BVP_input
     rock_parameters = st.session_state.rock_parameters
-    st.header("This is visualization")
-    st.write("BVP for ", BVP_input, " and for the ", rock_parameters)
+    st.header("Visualization")
+    st.write("for BVP ", BVP_input, " and for the ", rock_parameters)
     omegaParameterFrom = st.session_state.omegaParameterFrom
     omegaParameterTo = st.session_state.omegaParameterTo
     xiParInput = st.session_state.xiParInput
-    if(BVP_input == 1):
+    if(BVP_input == "1"):
       alpha = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
       beta = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
-    elif(BVP_input == 2):
+    elif(BVP_input == "2"):
       alpha = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
       beta = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
-    elif(BVP_input == 3):
+    elif(BVP_input == "3"):
       alpha = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 0]])
       beta = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 1]])
-    elif(BVP_input == 4):
+    elif(BVP_input == "4"):
       alpha = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 1]])
       beta = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 0]])
     else:
@@ -98,7 +121,21 @@ def page2():
       gammaBarPar = 0.94
       st.write("Successfully initialized parameters of ", rock_parameters, "!")
     else:
-      st.write("Sorry but we don't have this rock in our base...")
+      sigmaPar = st.session_state.sigmaPar
+      youngsMod = st.session_state.youngsMod
+      nuPar = st.session_state.nuPar
+      lambdaTPar = st.session_state.lambdaTPar
+      CTPar = st.session_state.CTPar
+      alphaTPar = st.session_state.alphaTPar
+      velPPar = st.session_state.velPPar
+      velSPar = st.session_state.velSPar
+      muPar = st.session_state.muPar
+      lambdaPar = st.session_state.lambdaPar
+      gammaPar = st.session_state.gammaPar
+      etaPar = st.session_state.etaPar
+      kappaPar = st.session_state.kappaPar
+      gammaPar = 0.94
+      st.write("Successfully initialized input parameters")
     try:
         epsilonPar = (gammaPar* etaPar*kappaPar)/(lambdaPar + 2* etaPar)
         cPar_1 = (lambdaPar + 2*muPar)/sigmaPar
@@ -155,7 +192,7 @@ def page2():
           KRoot1Change = np.zeros((10), dtype = "complex")
           for i in range(len(omegaChange)-1):
             KRoot1Change[i] = root_K1(xiPar, omegaChange[i])
-          fig, ax = plt.subplots(figsize=(3, 3))
+          fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot1Change), np.imag(KRoot1Change), '-.r*')
           ax.set_xlabel('Real part')
           ax.set_ylabel('Imaginary part')
@@ -261,13 +298,12 @@ def page2():
 
 
         #np.set_printoptions(linewidth=np.inf)
-        #st.write(B())
-        st.write("B matrix", B())
+        st.write(B())
         st.write("D matrix", D_iz())
         st.write("Roots of characteristic equation", kRootList(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
         st.write("Total V list", vListTotal(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
         #print(b_lj(xiParInput, omegaParameterTo-omegaParameterFrom))
-        st.write("A tensor", ATensor(1, xiParInput, omegaParameterTo-omegaParameterFrom))
+        #st.write("A tensor", ATensor(1, xiParInput, omegaParameterTo-omegaParameterFrom))
     except NameError:
         st.warning("No operations to perform")
     if st.button("Go back to page 1"):
