@@ -1,29 +1,65 @@
-input[type=message], input[type=email], input[type=text], textarea {
-  width: 100%; /* Full width */
-  padding: 12px; /* Some padding */ 
-  border: 1px solid #ccc; /* Gray border */
-  border-radius: 4px; /* Rounded borders */
-  box-sizing: border-box; /* Make sure that padding and width stays in place */
-  margin-top: 6px; /* Add a top margin */
-  margin-bottom: 16px; /* Bottom margin */
-  resize: vertical /* Allow the user to vertically resize the textarea (not horizontally) */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Style the submit button with a specific background color etc */
-button[type=submit] {
-  background-color: #04AA6D;
-  color: white;
-  padding: 12px 20px;
-  border: none;
+h1, h2, h3, h4, h5, h6 {
+  color: #c47451;
+}
+
+a {
+  color: #c47451;
+}
+
+a:hover {
+  color: #a05a32;
+}
+
+header {
+  background-color: #fff0e6;
+  padding: 20px;
+  margin-bottom: 40px;
+}
+
+footer {
+  background-color: #fff0e6;
+  padding: 20px;
+  margin-top: 40px;
+  text-align: center;
+}
+
+input[type="number"] {
+  padding: 8px;
   border-radius: 4px;
-  cursor: pointer;
+  border: 1px solid #cccccc;
 }
 
-/* When moving the mouse over the submit button, add a darker green color */
-button[type=submit]:hover {
-  background-color: #45a049;
+select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #cccccc;
+}
+
+table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+img {
+  max-width: 100%;
+}
 
 /* Hide Streamlit Branding */
 #MainMenu {visibility: hidden;}

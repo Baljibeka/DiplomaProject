@@ -12,24 +12,81 @@ from copy import copy, deepcopy
 from matplotlib import pyplot as plt
 
 st.set_page_config(page_title="Solving BVP", page_icon =":tada:", layout ="wide")
+
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
+
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-local_css("style/style.css")
+local_css("C:/Users/user/Desktop/Diploma Project/style/style.css")
+
+st.markdown("""
+    <style>
+        body {
+          background-color: #f7f3e9;
+          padding: 20px;
+          color: #444444;
+          font-family: Arial, sans-serif;
+        }
+        div.stButton > button:first-child {
+        background-color: #c47451;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        }
+        div.stButton > button:first-child:hover {
+        background-color: #a05a32;
+        color: #ffffff;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 def page1():
-    st.title("This is Earth-Deep Solver. Welcome!")
-    st.subheader("This solver is designed to solve the boundary value problems for a thermoelastic half plane subjected to both heat sources and mass forces")
-    st.write("Using this solver is simple - just input the necessary parameters and let the solver do the rest. You can input the material properties, the dimensions of the half plane, and the boundary conditions. The solver will then solve the partial differential equations governing the behavior of the half plane and provide you with the resulting temperature and displacement fields.")
+    with st.container():
+        st.title("This is Earth-Deep Solver. Welcome!")
+        st.subheader("This solver is designed to solve the boundary value problems for a thermoelastic half plane subjected to both heat sources and mass forces")
+        st.write("Using this solver is simple - just input the necessary parameters and let the solver do the rest. You can input the material properties, the dimensions of the half plane, and the boundary conditions. The solver will then solve the partial differential equations governing the behavior of the half plane and provide you with the resulting temperature and displacement fields.")
+        st.write("---")
+        st.subheader("Creators")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.write("Balzhan Shayakhmetova")
+        with col2:
+            st.write("Azamat Zhanbolat")
+        with col3:
+            st.write("Elmira Bukayeva")
+        text = "Special acknowledgement to <span class='shiny-text'>Alipova B.N.</span>"
+        css = """
+            <style>
+            .shiny-text {
+                animation: shine 3s linear infinite;
+            }
 
+            @keyframes shine {
+                0% { color: #1a1a1a; }
+                25% { color: #333333; }
+                50% { color: #FFFFFF; }
+                75% { color: #333333; }
+                100% { color: #c0c0c0; }
+            }
+            </style>
+            """
+        # Display the subheader with color change
+        st.markdown(css+text, unsafe_allow_html=True)
     st.write("---")
     st.header("Get started!")
     st.write("##")
     tableRocksImage = Image.open('Tablerocks.png')
     st.subheader("The rock parameters you can choose from")
     st.image(tableRocksImage, width=800, caption='Table of rocks')
+    st.subheader("BVPs")
+    st.write("BVP stands for Boundary Value Problem, which refers to a type of mathematical problem where the solution is sought within a specific range and is determined by specifying boundary conditions at the endpoints of that range.")
+    st.image(Image.open('BVPs.png'), width=500, caption='BVPs')
     BVP_input = st.selectbox('Choose BVP', ('1', '2', '3', '4'))
     rock_parameters = st.selectbox("Choose the rock from the table or input your own parameters", ("granite", "sandstone", "silicified shale", "silistone", "shales", "other"))
     if rock_parameters:
@@ -65,12 +122,17 @@ def page1():
     omegaParameterFrom=st.number_input("Choose frequency 1 ")
     omegaParameterTo = st.number_input("Choose frequency 2 ")
     xiParInput = st.number_input("Choose constant xi")
+    x_1 = st.number_input("Choose variable x1")
+    x_2 = st.number_input("Choose variable x2")
     st.session_state.BVP_input = BVP_input
     st.session_state.omegaParameterFrom = omegaParameterFrom
     st.session_state.omegaParameterTo = omegaParameterTo
     st.session_state.xiParInput = xiParInput
-    if st.button("Calculate"):
+    st.session_state.x_1 = x_1
+    st.session_state.x_2 = x_2
+    if st.button("Calculate", key="calculate_button"):
         st.session_state.page = "page2"
+
 
 def page2():
     # Retrieve the user input from session state
@@ -81,6 +143,8 @@ def page2():
     omegaParameterFrom = st.session_state.omegaParameterFrom
     omegaParameterTo = st.session_state.omegaParameterTo
     xiParInput = st.session_state.xiParInput
+    x_1 = st.session_state.x_1
+    x_2 = st.session_state.x_2
     if(BVP_input == "1"):
       alpha = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
       beta = np.array([[0, 0, 0],[0, 0, 0],[0, 0, 0]])
@@ -165,8 +229,7 @@ def page2():
           B = np.zeros((3, 3), dtype = 'complex_')
           for z in range(3):
               for j in range(3):
-                  B[z,j] = alpha[z,j] + alpha[z,2] * Kronecker(j,2)
-                  + beta[z,2] * Kronecker(j,2)
+                  B[z,j] = alpha[z,j] + alpha[z,2] * Kronecker(j,2) + beta[z,2] * Kronecker(j,2)
                   for l in range(3):
                       B[z,j] += beta[z,l] * D_iz()[l, j]
           return B
@@ -197,38 +260,50 @@ def page2():
           ax.set_xlabel('Real part')
           ax.set_ylabel('Imaginary part')
           ax.set_title('root_K1(xiPar={}, omega)'.format(xiPar))
-          plt.savefig('plot.png')
-          plt.show()
+          plt.savefig('plot1.png')
+          plt.close()
+          plot1 = Image.open('plot1.png')
+          st.image(plot1, width=400)
 
         def plottingK2(xiPar):
           omegaChange = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
           KRoot2Change = np.zeros((10), dtype = "complex")
           for i in range(len(omegaChange)-1):
             KRoot2Change[i] = root_K2(xiPar, omegaChange[i])
-          fig, ax = plt.subplots(figsize=(3, 3))
+          fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot2Change), np.imag(KRoot2Change), '-.r*')
           ax.set_xlabel('Real part')
           ax.set_ylabel('Imaginary part')
           ax.set_title('root_K2(xiPar={}, omega)'.format(xiPar))
-          plt.savefig('plot.png')
-          plt.show()
+          plt.savefig('plot2.png')
+          plt.close()
+          plot1 = Image.open('plot2.png')
+          st.image(plot1, width=400)
 
         def plottingK3(xiPar):
           omegaChangeRoot3 = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
           KRoot3Change = np.zeros((10), dtype = "complex")
           for i in range(len(omegaChangeRoot3)-1):
             KRoot3Change[i] = root_K3(xiPar, omegaChangeRoot3[i])
-          fig, ax = plt.subplots(figsize=(3, 3))
+          fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot3Change), np.imag(KRoot3Change), '-.r*')
           ax.set_xlabel('Real part')
           ax.set_ylabel('Imaginary part')
           ax.set_title('root_K3(xiPar={}, omega)'.format(xiPar))
-          plt.savefig('plot.png')
-          plt.show()
+          plt.savefig('plot3.png')
+          plt.close()
+          plot1 = Image.open('plot3.png')
+          st.image(plot1, width=400)
 
-        st.pyplot(plottingK1(xiParInput))
-        st.pyplot(plottingK2(xiParInput))
-        st.pyplot(plottingK3(xiParInput))
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            plottingK1(xiParInput)
+
+        with col2:
+            plottingK2(xiParInput)
+
+        with col3:
+            plottingK3(xiParInput)
 
         def kRootList(xiPar, omegaChange):
             kRootList = np.array([root_K1(xiPar, omegaChange), root_K2(xiPar, omegaChange), root_K3(xiPar, omegaChange)])
@@ -296,17 +371,137 @@ def page2():
                 ATensor[j] = np.linalg.det(a_lj(j, x_1, xiPar, omegaChange))/np.linalg.det(b_lj(xiPar, omegaChange))
               return ATensor
 
+        def calculate_VTensor(x_1, x_2,xiPar, omegaChange):
+              ATensorV = ATensor(x_1, xiPar, omegaChange)
+              vTotalList = vListTotal(xiPar, omegaChange)
+              kList = kRootList(xiPar, omegaChange)
+              VTensor = np.zeros((3, len(kList)), dtype=np.complex128)
+              VTensorElement = complex(0, 0)
+              for k in range(len(kList)):
+                VTensorElement = complex(0, 0)
+                for j in range(3):
+                  integrand = lambda xiPar: ATensorV[j] * vTotalList[k, j] * np.exp(1j * kList[j] * x_1 - 1j * xiPar * x_2)
+                  VTensorElement += quad(integrand, -np.inf, np.inf)[0]
+                VTensorElement *= 1 / (2 * np.pi)
+                VTensor[:, k] = VTensorElement
+              return VTensor
+        def F_S(x_1, x_2):
+            return np.heaviside(x_1, x_2)
 
-        #np.set_printoptions(linewidth=np.inf)
-        st.write(B())
-        st.write("D matrix", D_iz())
-        st.write("Roots of characteristic equation", kRootList(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
-        st.write("Total V list", vListTotal(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
-        #print(b_lj(xiParInput, omegaParameterTo-omegaParameterFrom))
-        #st.write("A tensor", ATensor(1, xiParInput, omegaParameterTo-omegaParameterFrom))
+        def Q_S(x_1, x_2):
+            return np.heaviside(x_1, x_2)
+
+        def calculate_ui(x_1, x_2, xiPar, omegaChange):
+            VTensor = calculate_VTensor(x_1, x_2, xiPar, omegaChange)
+
+            u = np.zeros(2, dtype=np.complex128)
+            for i in range(2):
+                u[i] = np.convolve(VTensor[i, 0], F_S(x_1, x_2), mode = 'valid') + np.convolve(VTensor[i, 1], F_S(x_1, x_2), mode='valid') + np.convolve(VTensor[i, 2], Q_S(x_1, x_2), mode='valid')
+            return u
+
+        def calculate_theta(x_1, x_2, xiPar, omegaChange):
+            VTensor = calculate_VTensor(x_1, x_2, xiPar, omegaChange)
+            theta = np.convolve(VTensor[2, 0],  F_S(x_1, x_2), mode='valid') + np.convolve(VTensor[2, 1], F_S(x_1, x_2), mode='valid') + np.convolve(VTensor[2, 2], Q_S(x_1, x_2), mode='valid')
+            return theta
+
+        def plot_u_theta(x_1, x_2, xiPar, omegaChange):
+          x_1_values = np.linspace(1, 10, 10)
+          x_2_values = np.linspace(1, 10, 10)
+          # Initialize arrays to store the results for x_1
+          u_values_x1 = np.zeros((10, 2), dtype=np.complex128)
+          theta_values_x1 = np.zeros(10, dtype=np.complex128)
+          # Initialize arrays to store the results for x_2
+          u_values_x2 = np.zeros((10, 2), dtype=np.complex128)
+          theta_values_x2 = np.zeros(10, dtype=np.complex128)
+          # Iterate over each x_1 value and calculate u and theta
+          for i, x_1 in enumerate(x_1_values):
+              u_values_x1[i] = calculate_ui(x_1, x_2, xiPar, omegaChange)
+              theta_values_x1[i] = calculate_theta(x_1, x_2, xiPar, omegaChange)
+          # Iterate over each x_2 value and calculate u and theta
+          for i, x_2 in enumerate(x_2_values):
+                u_values_x2[i] = calculate_ui(x_1, x_2, xiPar, omegaChange)
+                theta_values_x2[i] = calculate_theta(x_1, x_2, xiPar, omegaChange)
+
+          # Plot the graphs
+          plt.figure(figsize=(10, 5))
+
+          # Plot u for x_1
+          plt.subplot(2, 2, 1)
+          plt.plot(x_1_values, u_values_x1[:, 0].real, 'r', label ='u_1')
+          plt.plot(x_1_values, u_values_x1[:, 1].real, 'b', label='u_2')
+          plt.xlabel('x_1')
+          plt.ylabel('u')
+          plt.title('Graphs of u for x_1')
+          plt.legend()
+
+          # Plot theta for x_1
+          plt.subplot(2, 2, 2)
+          plt.plot(x_1_values, theta_values_x1.real, 'g', label = 'theta_1')
+          plt.xlabel('x_1')
+          plt.ylabel('theta')
+          plt.title('Graph of theta for x_1')
+
+          # Show the plots
+          plt.tight_layout()
+          plt.savefig("plot_image1.png")
+          plot1 = Image.open("plot_image1.png")
+          st.image(plot1, width=800)
+
+          # Plot u for x_2
+          plt.subplot(2, 2, 3)
+          plt.plot(x_2_values, u_values_x2[:, 0].real, 'r', label ='u_1')
+          plt.plot(x_2_values, u_values_x2[:, 1].real, 'b', label='u_2')
+          plt.xlabel('x_2')
+          plt.ylabel('u')
+          plt.title('Graphs of u for x_2')
+          plt.legend()
+
+          # Plot theta for x_2
+          plt.subplot(2, 2, 4)
+          plt.plot(x_2_values, theta_values_x2.real, 'g', label = 'theta_2')
+          plt.xlabel('x_2')
+          plt.ylabel('theta')
+          plt.title('Graph of theta for x_2')
+          # Show the plots
+          plt.tight_layout()
+          plt.savefig("plot_image2.png")
+          plot2 = Image.open("plot_image2.png")
+          st.image(plot2, width=800)
+
+
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            st.write("B matrix")
+            st.table(B())
+
+        with col5:
+            st.write("D matrix")
+            st.table(D_iz())
+
+        with col6:
+            st.write("Roots of characteristic equation")
+            st.table(kRootList(xiParInput, omegaParameterTo-omegaParameterFrom))
+
+        with col4:
+            st.write("Total ϑ list", vListTotal(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
+
+        with col5:
+            st.write("small b matrix", b_lj(xiParInput, omegaParameterTo-omegaParameterFrom))
+
+        with col6:
+            st.write("A tensor", ATensor(1, xiParInput, omegaParameterTo-omegaParameterFrom))
+
+        st.write("The final V Tensor is", calculate_VTensor(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
+
+        col7, col8 = st.columns(2)
+        with col7:
+            st.write("Displacement u", calculate_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
+        with col8:
+            st.write("Teperature theta", calculate_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
+        st.write("Solution of stationary oskilations f_z(x_2)", plotting_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
     except NameError:
         st.warning("No operations to perform")
-    if st.button("Go back to page 1"):
+    if st.button( "Go back to solver"):
         st.session_state.page = "page1"
 
 # Define the main function
