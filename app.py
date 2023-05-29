@@ -454,12 +454,12 @@ def page2():
           plt.xlabel('x_1')
           plt.ylabel('theta')
           plt.title('Graph of theta for x_1')
-
           # Show the plots
           plt.tight_layout()
           plt.savefig("plot_image1.png")
           plot1 = Image.open("plot_image1.png")
           st.image(plot1, width=800)
+
 
           # Plot u for x_2
           plt.subplot(2, 2, 3)
@@ -558,7 +558,7 @@ def page2():
         with col8:
             st.write("Teperature theta", calculate_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
         st.write("Solution of stationary oskilations f_z(x_2)")
-        plotting_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom)
+        plot_u_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom)
     except NameError:
         st.warning("No operations to perform")
     if st.button( "Go back to solver"):
