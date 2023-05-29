@@ -11,7 +11,7 @@ import scipy.special as special
 from copy import copy, deepcopy
 from matplotlib import pyplot as plt
 
-st.set_page_config(page_title="Solving BVP", page_icon =":tada:", layout ="wide")
+st.set_page_config(page_title="Solving BVP", page_icon =":1234:", layout ="wide")
 
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
