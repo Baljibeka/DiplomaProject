@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import math
 import cmath
-import math
 from PIL import Image
 import pandas as pd
 import scipy.integrate as integrate
