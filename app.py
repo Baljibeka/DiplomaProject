@@ -253,7 +253,7 @@ def page2():
         def plottingK1(xiPar):
           omegaChange = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
           KRoot1Change = np.zeros((10), dtype = "complex")
-          for i in range(len(omegaChange)-1):
+          for i in range(len(omegaChange)):
             KRoot1Change[i] = root_K1(xiPar, omegaChange[i])
           fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot1Change), np.imag(KRoot1Change), '-.r*')
@@ -268,7 +268,7 @@ def page2():
         def plottingK2(xiPar):
           omegaChange = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
           KRoot2Change = np.zeros((10), dtype = "complex")
-          for i in range(len(omegaChange)-1):
+          for i in range(len(omegaChange)):
             KRoot2Change[i] = root_K2(xiPar, omegaChange[i])
           fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot2Change), np.imag(KRoot2Change), '-.r*')
@@ -283,7 +283,7 @@ def page2():
         def plottingK3(xiPar):
           omegaChangeRoot3 = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
           KRoot3Change = np.zeros((10), dtype = "complex")
-          for i in range(len(omegaChangeRoot3)-1):
+          for i in range(len(omegaChangeRoot3)):
             KRoot3Change[i] = root_K3(xiPar, omegaChangeRoot3[i])
           fig, ax = plt.subplots(figsize=(6, 4))
           ax.plot(np.real(KRoot3Change), np.imag(KRoot3Change), '-.r*')
@@ -407,12 +407,20 @@ def page2():
         def plot_u_theta(x_1, x_2, xiPar, omegaChange):
           x_1_values = np.linspace(1, 10, 10)
           x_2_values = np.linspace(1, 10, 10)
+          xiParChange = np.linspace(1, 10, 10)
+          omega_values = np.linspace(omegaParameterFrom, omegaParameterTo, 10)
+          # Initialize arrays to store the results for xi
+          u_values_xi = np.zeros((10, 2), dtype=np.complex128)
+          theta_values_xi = np.zeros(10, dtype=np.complex128)
           # Initialize arrays to store the results for x_1
           u_values_x1 = np.zeros((10, 2), dtype=np.complex128)
           theta_values_x1 = np.zeros(10, dtype=np.complex128)
           # Initialize arrays to store the results for x_2
           u_values_x2 = np.zeros((10, 2), dtype=np.complex128)
           theta_values_x2 = np.zeros(10, dtype=np.complex128)
+          # Initialize arrays to store the results for omega
+          u_values_omega = np.zeros((10, 2), dtype=np.complex128)
+          theta_values_omega = np.zeros(10, dtype=np.complex128)
           # Iterate over each x_1 value and calculate u and theta
           for i, x_1 in enumerate(x_1_values):
               u_values_x1[i] = calculate_ui(x_1, x_2, xiPar, omegaChange)
@@ -421,7 +429,13 @@ def page2():
           for i, x_2 in enumerate(x_2_values):
                 u_values_x2[i] = calculate_ui(x_1, x_2, xiPar, omegaChange)
                 theta_values_x2[i] = calculate_theta(x_1, x_2, xiPar, omegaChange)
-
+          # Iterate over each x_2 value and calculate u and theta
+          for i, xi in enumerate(xiParChange):
+              u_values_xi[i] = calculate_ui(x_1, x_2, xi, omegaChange)
+              theta_values_xi[i] = calculate_theta(x_1, x_2, xi, omegaChange)
+          for i, omega in enumerate(omega_values):
+              u_values_omega[i] = calculate_ui(x_1, x_2, xi, omega)
+              theta_values_omega[i] = calculate_theta(x_1, x_2, xi, omega)
           # Plot the graphs
           plt.figure(figsize=(10, 5))
 
@@ -462,11 +476,56 @@ def page2():
           plt.xlabel('x_2')
           plt.ylabel('theta')
           plt.title('Graph of theta for x_2')
+
           # Show the plots
           plt.tight_layout()
           plt.savefig("plot_image2.png")
           plot2 = Image.open("plot_image2.png")
           st.image(plot2, width=800)
+
+          #Plot u for xi
+          plt.subplot(1, 2, 1)
+          plt.plot(xiParChange, u_values_xi[:, 0].real,'r', label='u_1')
+          plt.plot(xiParChange, u_values_xi[:, 1].real, 'g', label='u_2')
+          plt.xlabel('xi')
+          plt.ylabel('u')
+          plt.title('Graphs of u')
+          plt.legend()
+
+           # Plot theta for xi
+          plt.subplot(1, 2, 2)
+          plt.plot(xiParChange, theta_values_xi.real, 'g')
+          plt.xlabel('xi')
+          plt.ylabel('theta')
+          plt.title('Graph of theta')
+
+           # Show the plots
+          plt.tight_layout()
+          plt.savefig("plot_image3.png")
+          plot3 = Image.open("plot_image3.png")
+          st.image(plot3, width=800)
+
+          #Plot u for omega
+          plt.subplot(1, 2, 1)
+          plt.plot(omega_values, u_values_omega[:, 0].real,'r', label='u_1')
+          plt.plot(omega_values, u_values_omega[:, 1].real, 'g', label='u_2')
+          plt.xlabel('omega')
+          plt.ylabel('u')
+          plt.title('Graphs of u')
+          plt.legend()
+
+           # Plot theta for xi
+          plt.subplot(1, 2, 2)
+          plt.plot(xiParChange, theta_values_omega.real, 'g')
+          plt.xlabel('omega')
+          plt.ylabel('theta')
+          plt.title('Graph of theta')
+
+           # Show the plots
+          plt.tight_layout()
+          plt.savefig("plot_image4.png")
+          plot4 = Image.open("plot_image4.png")
+          st.image(plot4, width=800)
 
 
         col4, col5, col6 = st.columns(3)
@@ -498,7 +557,8 @@ def page2():
             st.write("Displacement u", calculate_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
         with col8:
             st.write("Teperature theta", calculate_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
-        st.write("Solution of stationary oskilations f_z(x_2)", plotting_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
+        st.write("Solution of stationary oskilations f_z(x_2)")
+        plotting_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom)
     except NameError:
         st.warning("No operations to perform")
     if st.button( "Go back to solver"):
