@@ -86,7 +86,7 @@ def page1():
     st.image(tableRocksImage, use_column_width=True, caption='Table of rocks')
     st.subheader("BVPs")
     st.write("BVP stands for Boundary Value Problem, which refers to a type of mathematical problem where the solution is sought within a specific range and is determined by specifying boundary conditions at the endpoints of that range.")
-    st.image(Image.open('BVPs.jpg'), use_column_width=True, caption='BVPs')
+    st.image(Image.open('BVPs.jpg'), width = 400, caption='BVPs')
     BVP_input = st.selectbox('Choose BVP', ('1', '2', '3', '4'))
     rock_parameters = st.selectbox("Choose the rock from the table or input your own parameters", ("granite", "sandstone", "silicified shale", "silistone", "shales", "other"))
     if rock_parameters:
