@@ -119,8 +119,8 @@ def page1():
             st.session_state.gammaPar = gammaPar
             st.session_state.etaPar = etaPar
             st.session_state.kappaPar = kappaPar
-    omegaParameterFrom=st.number_input("Choose starting frequency omega ")
-    omegaParameterTo = st.number_input("Choose endimg frequency omega ")
+    omegaParameterFrom=st.number_input("Choose starting angular frequency ")
+    omegaParameterTo = st.number_input("Choose ending angular frequency ")
     xiParInput = st.number_input("Choose constant xi")
     x_1 = st.number_input("Choose variable x1")
     x_2 = st.number_input("Choose variable x2")
@@ -543,7 +543,7 @@ def page2():
         with col6:
             st.write("Roots of characteristic equation")
             st.table(kRootList(xiParInput, omegaParameterTo-omegaParameterFrom))
-
+        st.write("#")
         with col4:
             st.write("Total ϑ list", vListTotal(xiParInput, omegaParameterTo-omegaParameterFrom).astype('object'))
 
