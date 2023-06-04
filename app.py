@@ -118,8 +118,8 @@ def page1():
             st.session_state.gammaPar = gammaPar
             st.session_state.etaPar = etaPar
             st.session_state.kappaPar = kappaPar
-    omegaParameterFrom=st.number_input("Choose frequency 1 ")
-    omegaParameterTo = st.number_input("Choose frequency 2 ")
+    omegaParameterFrom=st.number_input("Choose starting frequency omega ")
+    omegaParameterTo = st.number_input("Choose endimg frequency omega ")
     xiParInput = st.number_input("Choose constant xi")
     x_1 = st.number_input("Choose variable x1")
     x_2 = st.number_input("Choose variable x2")
@@ -358,8 +358,9 @@ def page2():
         def a_lj(j, x_1, xiPar, omegaChange):
               a = deepcopy(b_lj(xiPar, omegaChange))
               new_col = np.zeros((3),dtype = 'complex_')
-              for j in range(3):
-                new_col[j] = Kronecker(j, 1)
+              new_col[0] = Kronecker(j, 0)
+              new_col[1] = Kronecker(j, 1)
+              new_col[2] = Kronecker(j, 2)
               new_col = new_col.T
               a[:, j] = new_col
               return a
@@ -376,14 +377,16 @@ def page2():
               kList = kRootList(xiPar, omegaChange)
               VTensor = np.zeros((3, len(kList)), dtype=np.complex128)
               VTensorElement = complex(0, 0)
-              for k in range(len(kList)):
-                VTensorElement = complex(0, 0)
-                for j in range(3):
-                  integrand = lambda xiPar: ATensorV[j] * vTotalList[k, j] * np.exp(1j * kList[j] * x_1 - 1j * xiPar * x_2)
-                  VTensorElement += quad(integrand, -np.inf, np.inf)[0]
-                VTensorElement *= 1 / (2 * np.pi)
-                VTensor[:, k] = VTensorElement
+              for m in range(3):
+                for k in range(len(kList)):
+                  VTensorElement = complex(0, 0)
+                  for j in range(3):
+                    integrand = lambda xiPar: ATensorV[j] * vTotalList[k, j] * np.exp(1j * kList[j] * x_1 - 1j * xiPar * x_2)
+                    VTensorElement += quad(integrand, -np.inf, np.inf)[0]
+                  VTensorElement *= 1 / (2 * np.pi)
+                  VTensor[k, m] = VTensorElement/np.exp(100)
               return VTensor
+
         def F_S(x_1, x_2):
             return np.heaviside(x_1, x_2)
 
