@@ -83,7 +83,7 @@ def page1():
     st.write("##")
     tableRocksImage = Image.open('Tablerocks.png')
     st.subheader("The rock parameters you can choose from")
-    st.image(tableRocksImage, width = 400, caption='Table of rocks')
+    st.image(tableRocksImage, use_column_width = True, caption='Table of rocks')
     st.subheader("BVPs")
     st.write("BVP stands for Boundary Value Problem, which refers to a type of mathematical problem where the solution is sought within a specific range and is determined by specifying boundary conditions at the endpoints of that range.")
     st.image(Image.open('BVPs.jpg'), width = 400, caption='BVPs')
