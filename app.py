@@ -52,6 +52,7 @@ def page1():
         st.write("Using this solver is simple - just input the necessary parameters and let the solver do the rest. You can input the material properties, the dimensions of the half plane, and the boundary conditions. The solver will then solve the partial differential equations governing the behavior of the half plane and provide you with the resulting temperature and displacement fields.")
         st.write("---")
         st.subheader("Creators")
+        st.image(Image.open('logo of uni.png'), width=400)
         col1, col2, col3 = st.columns(3)
         with col1:
             st.write("Balzhan Shayakhmetova")
