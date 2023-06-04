@@ -559,7 +559,7 @@ def page2():
         with col7:
             st.write("Displacement u", calculate_ui(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
         with col8:
-            st.write("Teperature theta", calculate_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
+            st.write("Temperature theta", calculate_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom))
         st.write("Solution of stationary oskilations f_z(x_2)")
         plot_u_theta(x_1, x_2, xiParInput, omegaParameterTo-omegaParameterFrom)
     except NameError:
